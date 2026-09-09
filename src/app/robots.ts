@@ -1,8 +1,13 @@
 import type { MetadataRoute } from "next";
 
-import { absoluteUrl } from "@/lib/site";
+import { getSiteUrl } from "@/lib/site-url";
 
-export default function robots(): MetadataRoute.Robots {
+/** Generated per request so the sitemap URL matches the serving domain. */
+export const revalidate = 3600;
+
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const base = await getSiteUrl();
+
   return {
     rules: [
       {
@@ -13,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/admin/", "/api/"],
       },
     ],
-    sitemap: absoluteUrl("/sitemap.xml"),
-    host: absoluteUrl("/"),
+    sitemap: `${base}/sitemap.xml`,
+    host: base,
   };
 }

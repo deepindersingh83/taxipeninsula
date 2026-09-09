@@ -56,6 +56,13 @@ None of these are in the code. All go in `.env` on the server.
 - [ ] **🔴 `AUTH_SECRET`** — generate with `openssl rand -base64 48`. Admin
       sign-in will not work without it.
 - [ ] **🔴 Database credentials** — MySQL/MariaDB database, user and password.
+- [ ] **Set `NEXT_PUBLIC_SITE_URL="https://taxipeninsula.com.au"`.** Not
+      required — the domain is auto-detected, so the site runs correctly
+      without it — but pinning it in production makes every page statically
+      prerendered (faster) and stops a forged `Host` header reaching your
+      canonical tags or booking emails. See README → Domain.
+- [ ] **Pick a `PORT`** if 3000 is already taken on your server. Set it in
+      `.env`, or per-run with `PORT=4500 npm start`. See README → Port.
 - [ ] **Change the seeded admin password.** The seed creates an account with
       whatever `SEED_ADMIN_PASSWORD` is set to. Sign in and change it at
       `/admin/account` immediately.

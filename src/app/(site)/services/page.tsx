@@ -14,7 +14,8 @@ import {
   SectionHeading,
 } from "@/components/ui";
 import { services } from "@/content/services";
-import { absoluteUrl, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const metadata: Metadata = {
   title: "Our Services",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/services" },
 };
 
-function servicesJsonLd() {
+function servicesJsonLd(siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -35,7 +36,7 @@ function servicesJsonLd() {
         "@type": "Service",
         name: s.title,
         description: s.short,
-        url: absoluteUrl(`/services#${s.id}`),
+        url: `${siteUrl}/services#${s.id}`,
         provider: { "@type": "TaxiService", name: site.name },
         areaServed: { "@type": "AdministrativeArea", name: "Mornington Peninsula, Victoria" },
       },
@@ -43,7 +44,9 @@ function servicesJsonLd() {
   };
 }
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const siteUrl = await getSiteUrl();
+
   return (
     <>
       <PageHero
@@ -201,7 +204,7 @@ export default function ServicesPage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(servicesJsonLd(siteUrl)) }}
       />
     </>
   );

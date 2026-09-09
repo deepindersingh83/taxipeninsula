@@ -4,7 +4,8 @@ import Script from "next/script";
 
 import "./globals.css";
 
-import { absoluteUrl, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,10 +20,13 @@ const outfit = Outfit({
   weight: ["600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-  ),
+export async function generateMetadata(): Promise<Metadata> {
+  // Detected from the request unless NEXT_PUBLIC_SITE_URL pins it, so canonical
+  // and Open Graph URLs are correct on whatever domain this is served from.
+  const siteUrl = await getSiteUrl();
+
+  return {
+  metadataBase: new URL(siteUrl),
   title: {
     default: `${site.name} — Maxi Taxi & Wheelchair Accessible Transport, Melbourne`,
     template: `%s | ${site.name}`,
@@ -44,7 +48,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — Maxi Taxi & Wheelchair Accessible Transport`,
     description: site.description,
-    url: absoluteUrl("/"),
+    url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
@@ -65,7 +69,8 @@ export const metadata: Metadata = {
     icon: [{ url: "/brand/logo-dark.png", type: "image/png" }],
     apple: [{ url: "/brand/logo-dark.png" }],
   },
-};
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#ffc400",
@@ -77,14 +82,14 @@ export const viewport: Viewport = {
  * Structured data. `TaxiService` tells Google exactly what this business is,
  * which is what drives the local pack for "maxi taxi near me" style searches.
  */
-function organisationJsonLd() {
+function organisationJsonLd(siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "TaxiService",
     name: site.name,
     legalName: site.legalName,
     description: site.description,
-    url: absoluteUrl("/"),
+    url: siteUrl,
     telephone: site.phoneHref,
     email: site.email,
     priceRange: "$$",
@@ -118,9 +123,10 @@ function organisationJsonLd() {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const siteUrl = await getSiteUrl();
   const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim();
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
@@ -133,7 +139,9 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           // Static, developer-authored object — not user input.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organisationJsonLd()) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organisationJsonLd(siteUrl)),
+          }}
         />
 
         {/* reCAPTCHA v3. Only loaded when a site key is configured, so a fresh

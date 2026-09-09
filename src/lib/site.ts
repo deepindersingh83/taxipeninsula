@@ -176,9 +176,8 @@ export function fullAddress() {
     .join(", ");
 }
 
-export function absoluteUrl(path = "/") {
-  const base = (
-    process.env.NEXT_PUBLIC_SITE_URL || "https://taxipeninsula.com.au"
-  ).replace(/\/$/, "");
-  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
-}
+/**
+ * The site's base URL is NOT hardcoded here — it is detected from the incoming
+ * request so a fresh clone serves correctly on whatever domain it is reached
+ * by. See `src/lib/site-url.ts` for `absoluteUrl()` and friends.
+ */

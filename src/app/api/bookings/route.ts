@@ -6,7 +6,8 @@ import { detailRows, emailLayout, esc, sendMail } from "@/lib/mail";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { sendDriverSms, smsEnabled } from "@/lib/sms";
-import { absoluteUrl, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { absoluteUrlFrom } from "@/lib/site-url";
 import { bookingSchema, fieldErrors } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -105,6 +106,10 @@ export async function POST(request: Request) {
   /* ---------------------------------------------------------------- notify */
   const vehicle = carTypeLabel(data.carType);
   const when = `${formatDateLong(data.pickupDate)} at ${formatTime12h(data.pickupTime)}`;
+  // Built from this request, so the link works on whatever domain the site is
+  // served from — unless NEXT_PUBLIC_SITE_URL pins it, which it should in
+  // production (see lib/site-url.ts on host header trust).
+  const adminUrl = absoluteUrlFrom(request.headers, "/admin/bookings");
 
   const rows: Array<[string, string | number]> = [
     ["Reference", booking.reference],
@@ -131,7 +136,7 @@ export async function POST(request: Request) {
       `${detailRows(rows)}
        <p style="margin-top:20px;font-size:13px;color:#71717a;">
          Manage this booking in the admin panel:
-         <a href="${esc(absoluteUrl("/admin/bookings"))}">${esc(absoluteUrl("/admin/bookings"))}</a>
+         <a href="${esc(adminUrl)}">${esc(adminUrl)}</a>
        </p>`
     ),
     text: rows

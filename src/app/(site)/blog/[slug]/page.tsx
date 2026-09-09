@@ -14,7 +14,8 @@ import {
   incrementViewCount,
 } from "@/lib/posts";
 import { toPlainText } from "@/lib/sanitize";
-import { absoluteUrl, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const revalidate = 600;
 
@@ -44,7 +45,7 @@ export async function generateMetadata({
       type: "article",
       title: post.seoTitle || post.title,
       description,
-      url: absoluteUrl(`/blog/${post.slug}`),
+      url: await absoluteUrl(`/blog/${post.slug}`),
       publishedTime: post.publishedAt?.toISOString(),
       modifiedTime: post.updatedAt.toISOString(),
       images: post.coverImage ? [post.coverImage] : undefined,
@@ -78,9 +79,9 @@ export default async function BlogPostPage({
     publisher: {
       "@type": "Organization",
       name: site.legalName,
-      logo: { "@type": "ImageObject", url: absoluteUrl(site.logo.src) },
+      logo: { "@type": "ImageObject", url: await absoluteUrl(site.logo.src) },
     },
-    mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+    mainEntityOfPage: await absoluteUrl(`/blog/${post.slug}`),
     ...(post.coverImage ? { image: post.coverImage } : {}),
   };
 

@@ -16,7 +16,8 @@ import {
 } from "@/components/ui";
 import { services } from "@/content/services";
 import { getAreaBySlug, getNearbyAreas, getServiceAreas } from "@/lib/areas";
-import { absoluteUrl, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const revalidate = 3600;
 
@@ -48,7 +49,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${title} | ${site.name}`,
       description,
-      url: absoluteUrl(`/areas/${area.slug}`),
+      url: await absoluteUrl(`/areas/${area.slug}`),
     },
   };
 }
@@ -73,7 +74,7 @@ export default async function AreaPage({
     "@type": "TaxiService",
     name: `${site.name} — ${area.name}`,
     description: area.description || area.headline,
-    url: absoluteUrl(`/areas/${area.slug}`),
+    url: await absoluteUrl(`/areas/${area.slug}`),
     telephone: site.phoneHref,
     email: site.email,
     areaServed: {

@@ -45,6 +45,9 @@ npm run setup      # = prisma db push && prisma db seed
 npm run dev        # http://localhost:3000
 ```
 
+Nothing above is domain-specific — the site detects the domain it is served on
+(see [Domain](#domain)), so a fresh clone works immediately.
+
 Sign in to the admin panel at `/admin/login` with the `SEED_ADMIN_EMAIL` and
 `SEED_ADMIN_PASSWORD` from your `.env`. **Change that password immediately**
 from *Account settings*.
@@ -73,7 +76,7 @@ npm ci
 npx prisma db push        # creates the tables
 npm run db:seed           # first admin + service areas + starter posts
 npm run build
-npm start                 # serves on PORT (default 3000)
+npm start                 # serves on the configured port
 ```
 
 On cPanel, use **Setup Node.js App**: set the application root, application
@@ -85,9 +88,15 @@ or `pm2 start npm --name taxipeninsula -- start` on a plain VPS.
 
 ### 3. Reverse proxy
 
-Point nginx/Apache at `http://127.0.0.1:3000` and terminate TLS at the proxy.
-`NEXT_PUBLIC_SITE_URL` must be the real public HTTPS URL — it drives canonical
-URLs, the sitemap and Open Graph tags.
+Point nginx/Apache at `http://127.0.0.1:<your port>` and terminate TLS at the
+proxy. Make sure the proxy forwards the original host and scheme, or the site
+cannot work out its own public address:
+
+```nginx
+proxy_set_header Host              $host;
+proxy_set_header X-Forwarded-Host  $host;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
 
 ### 4. Writable uploads directory
 
@@ -107,7 +116,8 @@ that actually matter:
 | --- | --- | --- |
 | `DATABASE_URL` | **Yes** | Nothing works |
 | `AUTH_SECRET` | **Yes** | Admin sign-in throws |
-| `NEXT_PUBLIC_SITE_URL` | **Yes** | Wrong canonical URLs and sitemap |
+| `PORT` | No — defaults to 3000 | See [Port](#port) |
+| `NEXT_PUBLIC_SITE_URL` | No — auto-detected | See [Domain](#domain) |
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` / `RECAPTCHA_SECRET_KEY` | In production | **Public forms refuse to submit** |
 | `SMTP_*`, `MAIL_*` | Strongly recommended | Bookings are saved but no email is sent |
 | `ENABLE_SMS` + `TWILIO_*` | Optional | Driver SMS alerts stay off |
@@ -126,8 +136,75 @@ With no `RECAPTCHA_SECRET_KEY`:
 
 That is deliberate. A misconfigured production deploy must not silently accept
 unverified submissions. Register a v3 site at
-<https://www.google.com/recaptcha/admin> for `taxipeninsula.com.au` and paste
-both keys into `.env`.
+<https://www.google.com/recaptcha/admin> for your domain and paste both keys
+into `.env`.
+
+---
+
+## Port
+
+Several apps often share one box, so the port is an operator setting, never
+hardcoded. It is taken from the first of these that is set:
+
+| | How | Example |
+| --- | --- | --- |
+| 1 | `--port` flag | `npm start -- --port 4500` |
+| 2 | `PORT` environment variable | `PORT=4500 npm start` |
+| 3 | `PORT` in `.env` / `.env.local` | `PORT=4500` |
+| 4 | Default | `3000` |
+
+The shell environment deliberately beats `.env`, because managed hosts
+(cPanel/Passenger, Docker, systemd) assign a port that way and the app has to
+honour it.
+
+`.env` is read by `scripts/run-next.mjs` before Next.js starts. That script
+exists precisely so a `PORT` line in `.env` works — npm would otherwise expand
+`$PORT` from the shell long before Next.js ever reads `.env`, and setting it
+there would silently do nothing.
+
+**A few ports cannot be used.** Chrome and Firefox refuse to connect to about
+sixty well-known service ports — 6000 (X11), 6666, 5060, 587 and others — and
+Next.js rejects them for the same reason. Ask for one and you get a clear
+message naming the port and suggesting an alternative, rather than a site that
+mysteriously will not load:
+
+```
+✖ Port 6000 cannot be used (set via the PORT environment variable).
+
+  Chrome and Firefox refuse to open this port — it is on their blocked
+  list of well-known service ports — and Next.js rejects it for the same
+  reason. A site served there is unreachable in a browser.
+
+  Pick another port, for example 6001, 8080 or 8000:
+```
+
+---
+
+## Domain
+
+**The domain is detected automatically.** Clone the repo, start it, and the site
+works on whatever domain it is reached by — `taxipeninsula.com.au`, a staging
+subdomain, a bare IP, `localhost`. Canonical tags, Open Graph URLs,
+`sitemap.xml`, `robots.txt`, JSON-LD and the admin link in booking emails all
+follow the request.
+
+Behind a reverse proxy this relies on `X-Forwarded-Host` and
+`X-Forwarded-Proto`; the nginx snippet above sets both.
+
+Setting `NEXT_PUBLIC_SITE_URL` pins the domain instead, and is worth doing in
+production for two reasons:
+
+**Speed.** With it set, nothing reads request headers, so pages stay statically
+prerendered — all 38 area pages and every blog post. With it unset, the domain
+has to be read per request, so those pages render dynamically. Correct either
+way; measurably faster when pinned.
+
+**Trust.** `Host` is supplied by the client, and a misconfigured proxy can pass
+a forged one straight through. Pinning the domain means a spoofed `Host` can
+never reach a canonical tag or the admin link inside a booking notification
+email. Verified: with the variable set, a request carrying
+`Host: evil.example.com` still produces `https://taxipeninsula.com.au/...`
+everywhere.
 
 ---
 
