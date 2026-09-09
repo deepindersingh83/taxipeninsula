@@ -43,9 +43,13 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
-  // Honeypot — accept silently, store nothing.
-  if (data.company) {
-    return NextResponse.json({ ok: true });
+  // Honeypot. Saved and flagged rather than discarded — see the long note in
+  // the bookings route for why silently dropping these lost real enquiries.
+  const suspectedBot = Boolean(data.tp_hp_ref);
+  if (suspectedBot) {
+    console.warn(
+      `[contact] honeypot tripped by ${ip} — saving as spam for review, not discarding`
+    );
   }
 
   const captcha = await verifyRecaptcha(data.recaptchaToken, "contact", ip);
@@ -62,6 +66,7 @@ export async function POST(request: Request) {
         phone: data.phone,
         subject: data.subject || "General enquiry",
         message: data.message,
+        status: suspectedBot ? "spam" : "new",
       },
     });
   } catch (err) {
@@ -74,7 +79,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await sendMail({
+  const result = suspectedBot
+    ? { sent: false }
+    : await sendMail({
     to: process.env.MAIL_TO_ENQUIRIES || site.email,
     replyTo: data.email,
     subject: `Website enquiry: ${data.subject || "General enquiry"} — ${data.name}`,

@@ -146,9 +146,9 @@ export function Hero() {
           <div className="animate-float">
             <MaxiTaxi
               className="h-auto w-full drop-shadow-[0_30px_50px_rgba(0,0,0,0.55)]"
-              wheelSpeed={0.55}
               rampDown
               streaks
+              priority
               title="A wheelchair accessible maxi taxi with its rear ramp lowered"
             />
           </div>

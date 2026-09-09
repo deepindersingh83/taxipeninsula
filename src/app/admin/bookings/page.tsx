@@ -16,6 +16,7 @@ const filters = [
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
   { value: "upcoming", label: "Upcoming trips" },
+  { value: "spam", label: "Spam" },
 ];
 
 const PER_PAGE = 25;
@@ -38,7 +39,8 @@ export default async function AdminBookingsPage({
       ? { pickupDate: { gte: todayIso }, status: { in: ["new", "confirmed"] } }
       : status
         ? { status }
-        : {}),
+        // Unfiltered view hides flagged spam; the Spam tab shows it.
+        : { status: { not: "spam" } }),
     ...(q
       ? {
           OR: [

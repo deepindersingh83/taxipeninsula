@@ -160,7 +160,7 @@ export default async function BlogPostPage({
           >
             <div className="absolute inset-x-0 bottom-7 h-[2px] bg-white/10" />
             <div className="absolute bottom-3 left-0 w-28 animate-[tp-drive-across_20s_linear_infinite] sm:w-36">
-              <MaxiTaxi className="h-auto w-full" wheelSpeed={0.55} title="" />
+              <MaxiTaxi className="h-auto w-full" title="" />
             </div>
           </div>
 
@@ -195,7 +195,7 @@ export default async function BlogPostPage({
             <aside className="mt-14 overflow-hidden rounded-2xl border-2 border-taxi-500 bg-white">
               <div className="flex flex-col items-center gap-6 p-7 sm:flex-row sm:p-8">
                 <div className="w-40 shrink-0">
-                  <MaxiTaxi className="h-auto w-full" wheelSpeed={0.55} rampDown title="" />
+                  <MaxiTaxi className="h-auto w-full" rampDown title="" />
                 </div>
                 <div className="text-center sm:text-left">
                   <h2 className="font-display text-xl font-bold text-night-900">

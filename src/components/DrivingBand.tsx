@@ -49,15 +49,8 @@ export function DrivingBand({
       {/* Road surface */}
       <div className="relative mx-auto h-px w-full max-w-none bg-transparent">
         <div className="absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 rounded-full bg-night-900/90" />
-        <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center gap-8 overflow-hidden px-2">
-          <div className="animate-road flex w-[200%] items-center gap-8">
-            {Array.from({ length: 40 }).map((_, i) => (
-              <span
-                key={i}
-                className="h-[2px] w-10 shrink-0 rounded-full bg-taxi-500/70"
-              />
-            ))}
-          </div>
+        <div className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 overflow-hidden">
+          <div className="animate-road road-dashes absolute inset-y-0 left-0 w-[calc(100%+120px)] text-taxi-500/70" />
         </div>
       </div>
 
@@ -70,7 +63,6 @@ export function DrivingBand({
           className={`h-auto w-full drop-shadow-[0_10px_24px_rgba(15,18,22,0.28)] ${
             reverse ? "-scale-x-100" : ""
           }`}
-          wheelSpeed={0.5}
           rampDown={rampDown}
           streaks
           title=""

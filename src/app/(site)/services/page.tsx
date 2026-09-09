@@ -156,7 +156,6 @@ export default async function ServicesPage() {
                         <div className="animate-float">
                           <MaxiTaxi
                             className="h-auto w-full"
-                            wheelSpeed={0.55 + (i % 3) * 0.1}
                             rampDown={service.id === "wheelchair" || service.id === "ndis"}
                             streaks={i % 2 === 0}
                             title={service.title}

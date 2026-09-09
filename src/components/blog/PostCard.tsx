@@ -47,7 +47,7 @@ export function PostCard({
         ) : (
           <div className="grid size-full place-items-center bg-gradient-to-br from-taxi-500/25 via-cream to-night-100 p-8">
             <div className="w-full max-w-[12rem]">
-              <MaxiTaxi className="h-auto w-full" wheelSpeed={0.75} title="" />
+              <MaxiTaxi className="h-auto w-full" title="" />
             </div>
           </div>
         )}

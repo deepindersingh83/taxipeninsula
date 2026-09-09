@@ -9,7 +9,6 @@ export default function NotFound() {
       <div className="w-full max-w-sm">
         <MaxiTaxi
           className="h-auto w-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
-          wheelSpeed={0.5}
           streaks
           title=""
         />

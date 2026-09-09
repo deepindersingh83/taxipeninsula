@@ -72,11 +72,12 @@ export const bookingSchema = z.object({
   /**
    * Honeypot. Deliberately NOT constrained here: if the schema rejected a
    * filled-in value, the bot would get a 400 naming this field and simply stop
-   * filling it in. Instead the value is allowed through validation and the API
-   * route silently discards the submission, so the bot sees a success response
-   * and never learns it was caught.
+   * filling it in. The value is allowed through validation and the API route
+   * decides what to do with it, so the bot learns nothing from the response.
+   *
+   * The name is meaningless on purpose — see components/forms/Field.tsx.
    */
-  company: z.string().max(200).optional().default(""),
+  tp_hp_ref: z.string().max(200).optional().default(""),
 
   recaptchaToken: z.string().optional(),
 });
@@ -93,8 +94,8 @@ export const contactSchema = z.object({
     .trim()
     .min(10, "Please tell us a little more — at least 10 characters")
     .max(3000),
-  /** Honeypot — see the note on `bookingSchema.company`. */
-  company: z.string().max(200).optional().default(""),
+  /** Honeypot — see the note on `bookingSchema.tp_hp_ref`. */
+  tp_hp_ref: z.string().max(200).optional().default(""),
   recaptchaToken: z.string().optional(),
 });
 

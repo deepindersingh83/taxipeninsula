@@ -49,20 +49,26 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
-  // Honeypot. Return a success shape so a bot cannot tell it was caught, but
-  // write nothing and notify nobody.
-  if (data.company) {
-    return NextResponse.json({
-      booking: {
-        reference: generateReference(),
-        name: data.name,
-        pickupDate: data.pickupDate,
-        pickupTime: data.pickupTime,
-        pickupLocation: data.pickupLocation,
-        dropoffLocation: data.dropoffLocation,
-        emailed: true,
-      },
-    });
+  /**
+   * Honeypot.
+   *
+   * This deliberately does NOT discard the submission. An earlier version did,
+   * and it lost real bookings: the field was named `company`, browser autofill
+   * filled it in for genuine customers, and they got a booking reference for a
+   * trip that was never recorded.
+   *
+   * For a taxi business the asymmetry is stark — a false positive costs a real
+   * fare, a false negative costs one junk row someone deletes in two seconds.
+   * So a tripped honeypot is saved like any other booking, flagged `spam` so it
+   * stays out of the "new" queue and the dashboard counts, and reviewable under
+   * the Spam filter in the admin panel. The response is the normal success
+   * shape, so an actual bot still learns nothing.
+   */
+  const suspectedBot = Boolean(data.tp_hp_ref);
+  if (suspectedBot) {
+    console.warn(
+      `[bookings] honeypot tripped by ${ip} — saving as spam for review, not discarding`
+    );
   }
 
   /* ------------------------------------------------------------- reCAPTCHA */
@@ -91,6 +97,12 @@ export async function POST(request: Request) {
         luggage: data.luggage,
         flightNumber: data.flightNumber,
         notes: data.notes,
+        status: suspectedBot ? "spam" : "new",
+        adminNotes: suspectedBot
+          ? "Flagged automatically: the hidden anti-spam field was filled in. " +
+            "Usually a bot — but check before deleting, because a browser " +
+            "extension can occasionally do the same to a genuine booking."
+          : "",
       },
     });
   } catch (err) {
@@ -127,7 +139,12 @@ export async function POST(request: Request) {
     ["Notes", data.notes],
   ];
 
-  const operatorEmail = sendMail({
+  // Suspected bots are recorded but never notified about — no operator email,
+  // no customer confirmation, no driver SMS. Staff review them under the Spam
+  // filter instead.
+  const operatorEmail = suspectedBot
+    ? Promise.resolve({ sent: false })
+    : sendMail({
     to: process.env.MAIL_TO_BOOKINGS || site.email,
     replyTo: data.email || undefined,
     subject: `New booking ${booking.reference} — ${when} — ${vehicle}`,
@@ -146,7 +163,7 @@ export async function POST(request: Request) {
   });
 
   const customerEmail =
-    data.email && process.env.SEND_CUSTOMER_CONFIRMATION !== "false"
+    !suspectedBot && data.email && process.env.SEND_CUSTOMER_CONFIRMATION !== "false"
       ? sendMail({
           to: data.email,
           subject: `We've got your booking — ${booking.reference}`,
@@ -186,7 +203,7 @@ export async function POST(request: Request) {
         })
       : Promise.resolve({ sent: false });
 
-  const driverSms = smsEnabled()
+  const driverSms = !suspectedBot && smsEnabled()
     ? sendDriverSms(
         `NEW ${booking.reference}: ${when}. ${data.pickupLocation} -> ${data.dropoffLocation}. ` +
           `${vehicle}, ${data.passengers} pax. ${data.name} ${data.phone}`

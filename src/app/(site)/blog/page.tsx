@@ -117,7 +117,7 @@ export default async function BlogPage({
           {posts.length === 0 ? (
             <div className="mt-12 rounded-3xl border border-dashed border-night-300 bg-white p-12 text-center">
               <div className="mx-auto w-44">
-                <MaxiTaxi className="h-auto w-full" wheelSpeed={1.2} title="" />
+                <MaxiTaxi className="h-auto w-full" title="" />
               </div>
               <h2 className="mt-6 font-display text-xl font-bold text-night-900">
                 Nothing here yet

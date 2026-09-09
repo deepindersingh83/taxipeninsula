@@ -24,7 +24,9 @@ export default async function AdminDashboard() {
   const warnings: string[] = [];
   if (!mailConfigured()) {
     warnings.push(
-      "Email is not configured (SMTP_HOST is blank). Bookings are being saved, but no notification emails are going out."
+      `Email is NOT configured, so no booking notifications are reaching ${
+        process.env.MAIL_TO_BOOKINGS || "support@taxipeninsula.com.au"
+      }. Every booking is still being saved and is listed below — nothing is lost — but you have to check this page rather than your inbox. To fix it, set SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASSWORD in .env and restart.`
     );
   }
   if (!recaptchaEnabled()) {

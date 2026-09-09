@@ -185,7 +185,7 @@ export function Header() {
             </a>
 
             <div className="mt-6 w-32 pb-8">
-              <MaxiTaxi className="h-auto w-full" wheelSpeed={0.55} rampDown title="" />
+              <MaxiTaxi className="h-auto w-full" rampDown title="" />
             </div>
           </motion.div>
         )}

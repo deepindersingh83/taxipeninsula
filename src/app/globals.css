@@ -181,6 +181,24 @@
   animation: tp-road-dash 0.9s linear infinite;
 }
 
+/* Road markings as a single painted gradient rather than a few dozen DOM
+   nodes. Each strip used to render 30–40 <span>s; multiplied by the number of
+   strips per page, and again by React's serialised payload, that was a
+   meaningful chunk of every HTML document.
+
+   The 120px period matches the -120px travel of `tp-road-dash` exactly, so the
+   loop is seamless. */
+@utility road-dashes {
+  background-image: repeating-linear-gradient(
+    to right,
+    currentColor 0 60px,
+    transparent 60px 120px
+  );
+  background-repeat: repeat-x;
+  background-size: 120px 2px;
+  background-position: 0 center;
+}
+
 @utility animate-rooflight {
   animation: tp-rooflight 1.8s ease-in-out infinite;
 }

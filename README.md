@@ -239,18 +239,37 @@ record and shown in the admin panel.
 submission through an allow-list before it is stored, so the database can never
 hold a script tag regardless of what renders it later.
 
-**Three layers of spam defence.** A hidden honeypot field (submissions are
-silently discarded so a bot never learns it was caught), an in-memory
-fixed-window rate limiter per IP, and reCAPTCHA v3 score checking.
+**Three layers of spam defence** — but a tripped honeypot is never discarded.
+The hidden field is saved and flagged `spam`, out of the "new" queue and the
+dashboard counts, reviewable under the Spam filter. That is deliberate: the
+field was once named `company`, browser autofill filled it for real customers,
+and those bookings were dropped after showing the customer a reference. For a
+taxi business a false positive costs a fare and a false negative costs one junk
+row, so the trade is not close. The field name is now meaningless on purpose —
+do not rename it to anything a browser might recognise. The other two layers are
+an in-memory per-IP rate limiter and reCAPTCHA v3 score checking.
 
 **Auth is a signed JWT in an httpOnly cookie.** `middleware.ts` does a cheap
 signature check on the Edge; every admin page and Server Action independently
 calls `requireUser()`, because middleware is a convenience, not the security
 boundary.
 
-**The animated taxi is pure SVG + CSS.** No image requests, sharp at any size,
-recoloured from theme tokens, and completely still for anyone with
-`prefers-reduced-motion: reduce`.
+**The animated taxi is a cached external SVG, not inline markup.** It appears
+up to a dozen times per page. Inlined it cost ~6 KB of markup per copy — and
+React serialises the tree a second time into the RSC payload, so nearer 12 KB
+each. That alone made the home page 310 KB of HTML and the services page
+448 KB. As a file the browser fetches one ~7 KB SVG, caches it, and every
+further instance is one `<img>` tag; pages came down 47–66%. The CSS animations
+declared inside the SVG still run through `<img>`, and the
+`prefers-reduced-motion` query inside it still honours the viewer's system
+setting. Edit the artwork in `scripts/build-taxi-svg.mjs` and run
+`npm run build:taxi` — `npm run build` regenerates it too, so the committed
+files cannot drift.
+
+**Decorative repetition is painted, not built from DOM nodes.** The road dashes
+were 30–40 `<span>`s per strip and the taxi's checker band 25 `<rect>`s per
+vehicle; they are now one CSS gradient and one SVG `<pattern>`. Home went from
+roughly 1,900 DOM nodes to 624.
 
 **Watch out for the road strips.** `RoadStrip` positions its dash track
 absolutely. The track is deliberately far wider than the viewport, and a
@@ -271,6 +290,7 @@ same reason, grid templates here use `minmax(0, 1fr)` rather than `1fr`.
 | `npm run db:push` | Applies `prisma/schema.prisma` to the database |
 | `npm run db:seed` | Seeds admin user, 38 service areas, categories, 3 posts |
 | `npm run db:studio` | Prisma Studio — a raw database browser |
+| `npm run build:taxi` | Regenerates the taxi SVG artwork into `public/brand/` |
 
 ---
 

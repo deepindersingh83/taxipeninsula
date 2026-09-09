@@ -16,6 +16,7 @@ const filters = [
   { value: "new", label: "Unread" },
   { value: "read", label: "Read" },
   { value: "replied", label: "Replied" },
+  { value: "spam", label: "Spam" },
 ];
 
 export default async function AdminEnquiriesPage({
@@ -30,7 +31,8 @@ export default async function AdminEnquiriesPage({
 
   const [enquiries, counts] = await Promise.all([
     prisma.enquiry.findMany({
-      where: status ? { status } : undefined,
+      // Unfiltered view hides flagged spam; the Spam tab shows it.
+      where: status ? { status } : { status: { not: "spam" } },
       orderBy: { createdAt: "desc" },
       take: 100,
     }),

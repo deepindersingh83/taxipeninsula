@@ -125,7 +125,7 @@ export function BookingForm() {
         className="rounded-3xl border-2 border-taxi-500 bg-white p-8 text-center sm:p-12"
       >
         <div className="mx-auto w-48">
-          <MaxiTaxi wheelSpeed={0.5} rampDown streaks className="h-auto w-full" title="" />
+          <MaxiTaxi rampDown streaks className="h-auto w-full" title="" />
         </div>
 
         <h2 className="mt-6 font-display text-2xl font-extrabold text-night-900 sm:text-3xl">
@@ -323,7 +323,6 @@ export function BookingForm() {
           <div className="w-28 shrink-0 sm:w-36">
             <MaxiTaxi
               className="h-auto w-full"
-              wheelSpeed={0.6}
               rampDown={isWheelchair}
               title=""
             />

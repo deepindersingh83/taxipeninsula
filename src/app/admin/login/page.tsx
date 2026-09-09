@@ -22,7 +22,7 @@ export default async function LoginPage({
     <div className="flex min-h-dvh flex-col items-center justify-center bg-night-900 px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="mx-auto w-40">
-          <MaxiTaxi className="h-auto w-full" wheelSpeed={0.6} title="" />
+          <MaxiTaxi className="h-auto w-full" title="" />
         </div>
 
         <RoadStrip className="mt-3" />

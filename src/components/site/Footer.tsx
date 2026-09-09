@@ -23,7 +23,7 @@ export function Footer() {
       <div className="relative h-20 overflow-hidden border-b border-white/5">
         <div className="absolute inset-x-0 bottom-6 h-[3px] bg-white/10" />
         <div className="absolute bottom-2 left-0 w-36 animate-[tp-drive-across_16s_linear_infinite] sm:w-44">
-          <MaxiTaxi className="h-auto w-full" wheelSpeed={0.5} title="" />
+          <MaxiTaxi className="h-auto w-full" title="" />
         </div>
       </div>
 

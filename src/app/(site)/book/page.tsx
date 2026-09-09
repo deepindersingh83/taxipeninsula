@@ -83,7 +83,6 @@ export default function BookPage() {
               <div className="animate-float">
                 <MaxiTaxi
                   className="h-auto w-full drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)]"
-                  wheelSpeed={0.5}
                   rampDown
                   streaks
                   title="Wheelchair accessible maxi taxi ready for booking"
@@ -103,7 +102,7 @@ export default function BookPage() {
             fallback={
               <div className="rounded-3xl border border-night-200 bg-white p-10 text-center">
                 <div className="mx-auto w-40">
-                  <MaxiTaxi className="h-auto w-full" wheelSpeed={0.4} title="" />
+                  <MaxiTaxi className="h-auto w-full" title="" />
                 </div>
                 <p className="mt-4 text-sm font-semibold text-night-500">
                   Loading the booking form…

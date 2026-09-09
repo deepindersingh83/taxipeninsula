@@ -89,7 +89,7 @@ export function ContactForm() {
         className="rounded-3xl border-2 border-taxi-500 bg-white p-8 text-center sm:p-10"
       >
         <div className="mx-auto w-40">
-          <MaxiTaxi className="h-auto w-full" wheelSpeed={0.5} streaks title="" />
+          <MaxiTaxi className="h-auto w-full" streaks title="" />
         </div>
         <h2 className="mt-6 font-display text-2xl font-extrabold text-night-900">
           Message sent.

@@ -191,7 +191,6 @@ export default async function HomePage() {
                 <div className="animate-float">
                   <MaxiTaxi
                     className="h-auto w-full drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)]"
-                    wheelSpeed={0.7}
                     rampDown
                     title="Maxi taxi with the wheelchair ramp deployed"
                   />
@@ -362,7 +361,7 @@ export default async function HomePage() {
                         />
                       ) : (
                         <div className="grid size-full place-items-center bg-gradient-to-br from-taxi-500/20 to-night-100 p-8">
-                          <MaxiTaxi className="h-auto w-40" wheelSpeed={0.8} title="" />
+                          <MaxiTaxi className="h-auto w-40" title="" />
                         </div>
                       )}
                     </div>
@@ -424,7 +423,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-4 left-0 w-32 animate-[tp-drive-across_14s_linear_infinite] opacity-90 sm:w-44"
               >
-                <MaxiTaxi className="h-auto w-full" wheelSpeed={0.45} streaks title="" />
+                <MaxiTaxi className="h-auto w-full" streaks title="" />
               </div>
             </div>
           </Reveal>

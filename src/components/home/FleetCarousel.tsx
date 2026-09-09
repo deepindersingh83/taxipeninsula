@@ -97,7 +97,6 @@ export function FleetCarousel() {
             <div className="mt-8 max-w-md">
               <MaxiTaxi
                 className="h-auto w-full"
-                wheelSpeed={0.55}
                 rampDown={isWheelchair}
                 title={vehicle.label}
               />

@@ -90,7 +90,7 @@ export default function ContactPage() {
 
                 <div className="rounded-2xl border border-night-200 bg-night-900 p-6 text-center">
                   <div className="mx-auto w-36">
-                    <MaxiTaxi className="h-auto w-full" wheelSpeed={0.5} rampDown title="" />
+                    <MaxiTaxi className="h-auto w-full" rampDown title="" />
                   </div>
                   <p className="mt-4 text-sm leading-relaxed text-night-300">
                     Need a wheelchair accessible vehicle today? Call rather than

@@ -50,8 +50,12 @@ export async function sendMail(opts: {
 }): Promise<SendResult> {
   const t = transport();
   if (!t) {
-    console.warn(
-      `[mail] SMTP_HOST is not set — skipped sending "${opts.subject}" to ${opts.to}`
+    console.error(
+      `\n[mail] ✖ NOT SENT: "${opts.subject}" → ${opts.to}\n` +
+        `        SMTP is not configured, so no booking or enquiry email is\n` +
+        `        going out. The record IS saved and visible in /admin.\n` +
+        `        Fix: set SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASSWORD\n` +
+        `        in .env, then restart. See README → Environment variables.\n`
     );
     return { sent: false, error: "SMTP not configured" };
   }

@@ -31,7 +31,7 @@ export function AdminShell({
       <aside className="shrink-0 bg-night-900 lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:overflow-y-auto">
         <div className="flex items-center gap-3 px-5 py-5">
           <span className="w-12 shrink-0">
-            <MaxiTaxi className="h-auto w-full" wheelSpeed={0.6} title="" />
+            <MaxiTaxi className="h-auto w-full" title="" />
           </span>
           <span>
             <span className="block font-display text-sm font-extrabold text-white">

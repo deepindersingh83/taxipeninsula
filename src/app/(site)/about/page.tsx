@@ -108,7 +108,6 @@ export default function AboutPage() {
                 <div className="animate-float">
                   <MaxiTaxi
                     className="h-auto w-full"
-                    wheelSpeed={0.6}
                     rampDown
                     title="Taxi Peninsula wheelchair accessible maxi taxi"
                   />
@@ -229,7 +228,7 @@ export default function AboutPage() {
                 aria-hidden="true"
                 className="pointer-events-none absolute -bottom-4 left-0 w-32 animate-[tp-drive-across_15s_linear_infinite] sm:w-44"
               >
-                <MaxiTaxi className="h-auto w-full" wheelSpeed={0.45} streaks title="" />
+                <MaxiTaxi className="h-auto w-full" streaks title="" />
               </div>
             </div>
           </Reveal>

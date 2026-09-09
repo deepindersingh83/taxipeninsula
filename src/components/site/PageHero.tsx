@@ -96,7 +96,7 @@ export function PageHero({
       >
         <div className="absolute inset-x-0 bottom-8 h-[2px] bg-white/10" />
         <div className="absolute bottom-4 left-0 w-32 animate-[tp-drive-across_18s_linear_infinite] sm:w-40">
-          <MaxiTaxi className="h-auto w-full" wheelSpeed={0.5} rampDown={rampDown} title="" />
+          <MaxiTaxi className="h-auto w-full" rampDown={rampDown} title="" />
         </div>
       </div>
 

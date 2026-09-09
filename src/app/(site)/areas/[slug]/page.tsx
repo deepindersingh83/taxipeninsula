@@ -190,7 +190,7 @@ export default async function AreaPage({
               <aside className="lg:sticky lg:top-28">
                 <Card className="hover:translate-y-0">
                   <div className="mx-auto w-40">
-                    <MaxiTaxi className="h-auto w-full" wheelSpeed={0.55} rampDown title="" />
+                    <MaxiTaxi className="h-auto w-full" rampDown title="" />
                   </div>
 
                   <h3 className="mt-5 text-center font-display text-xl font-bold text-night-900">

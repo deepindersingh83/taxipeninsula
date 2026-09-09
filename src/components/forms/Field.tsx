@@ -173,17 +173,32 @@ export function SelectField({
 /**
  * Honeypot. Positioned off-screen rather than `display:none` because some bots
  * specifically skip hidden inputs. Real users never see or tab to it.
+ *
+ * ⚠️ THE FIELD NAME MATTERS. This was originally called `company`, which broke
+ * real bookings: browser address-autofill recognises `company`/`organization`
+ * as a real field and fills it in, so any customer with autofill enabled
+ * tripped the trap. `autocomplete="off"` does not reliably stop that — Chrome
+ * and Safari ignore it for address-shaped fields.
+ *
+ * So the name is deliberately meaningless. Do not rename it to anything a
+ * browser might recognise as an address, contact or organisation field.
  */
+export const HONEYPOT_FIELD = "tp_hp_ref";
+
 export function Honeypot() {
   return (
     <div aria-hidden="true" className="absolute -left-[9999px] size-px overflow-hidden">
-      <label htmlFor="company">Company (leave this blank)</label>
+      <label htmlFor={HONEYPOT_FIELD}>Leave this field blank</label>
       <input
-        id="company"
-        name="company"
+        id={HONEYPOT_FIELD}
+        name={HONEYPOT_FIELD}
         type="text"
         tabIndex={-1}
         autoComplete="off"
+        // Belt and braces: also opt out of the newer autofill hints.
+        data-1p-ignore=""
+        data-lpignore="true"
+        data-form-type="other"
         defaultValue=""
       />
     </div>

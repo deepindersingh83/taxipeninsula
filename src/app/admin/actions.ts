@@ -243,7 +243,7 @@ export async function deleteCategoryAction(formData: FormData) {
 
 /* ---------------------------------------------------------------- bookings */
 
-const BOOKING_STATUSES = ["new", "confirmed", "completed", "cancelled"];
+const BOOKING_STATUSES = ["new", "confirmed", "completed", "cancelled", "spam"];
 
 export async function updateBookingAction(formData: FormData) {
   await requireUser();
