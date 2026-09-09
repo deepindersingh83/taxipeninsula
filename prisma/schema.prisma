@@ -1,0 +1,140 @@
+// Taxi Peninsula — database schema
+//
+// Target: MySQL / MariaDB on a standard server (cPanel, Plesk or a VPS).
+//
+// Setup:
+//   1. Create a database and user in cPanel / phpMyAdmin.
+//   2. Put the connection string in DATABASE_URL, e.g.
+//        mysql://taxi_user:password@localhost:3306/taxi_peninsula
+//   3. Run `npx prisma db push` to create the tables.
+//
+// MySQL note: Prisma maps `String` to VARCHAR(191) by default. Any field that
+// can hold long free text is explicitly annotated `@db.Text` below, otherwise
+// a long blog post or a chatty booking note would be truncated or rejected.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// Staff who can sign in to /admin.
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("editor") // "admin" | "editor"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts Post[]
+}
+
+/// A blog post, authored through the admin panel.
+model Post {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String    @db.VarChar(200)
+  excerpt        String    @default("") @db.Text
+  /// Sanitised HTML produced by the admin rich-text editor.
+  content        String    @default("") @db.LongText
+  coverImage     String?   @db.VarChar(500)
+  status         String    @default("draft") // "draft" | "published"
+  publishedAt    DateTime?
+  /// SEO overrides. Fall back to title/excerpt when blank.
+  seoTitle       String?   @db.VarChar(200)
+  seoDescription String?   @db.Text
+  readingMinutes Int       @default(1)
+  viewCount      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+/// Blog categories, managed from the admin panel.
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String   @db.VarChar(120)
+  description String   @default("") @db.Text
+  createdAt   DateTime @default(now())
+
+  posts Post[]
+}
+
+/// A ride booking submitted from /book.
+model Booking {
+  id              String   @id @default(cuid())
+  reference       String   @unique
+  name            String   @db.VarChar(120)
+  phone           String   @db.VarChar(30)
+  email           String?  @db.VarChar(200)
+  pickupDate      String   @db.VarChar(10) // ISO date, e.g. "2026-04-12"
+  pickupTime      String   @db.VarChar(5)  // 24h time, e.g. "07:30"
+  pickupLocation  String   @db.Text
+  dropoffLocation String   @db.Text
+  carType         String   @db.VarChar(40)
+  passengers      Int
+  /// Optional extras captured by the form.
+  wheelchairSeats Int      @default(0)
+  luggage         String   @default("") @db.VarChar(120)
+  notes           String   @default("") @db.Text
+  flightNumber    String   @default("") @db.VarChar(40)
+  status          String   @default("new") // new | confirmed | completed | cancelled
+  adminNotes      String   @default("") @db.Text
+  /// Delivery outcomes so staff can see whether alerts actually went out.
+  emailSent       Boolean  @default(false)
+  smsSent         Boolean  @default(false)
+  sourcePage      String   @default("/book") @db.VarChar(200)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([pickupDate])
+}
+
+/// A message submitted from /contact.
+model Enquiry {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(120)
+  email     String   @db.VarChar(200)
+  phone     String   @default("") @db.VarChar(30)
+  subject   String   @default("") @db.VarChar(160)
+  message   String   @db.Text
+  status    String   @default("new") // new | read | replied
+  emailSent Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// Suburbs / regions served, each rendered as its own SEO landing page.
+model ServiceArea {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String   @db.VarChar(120)
+  region      String   @default("Mornington Peninsula") @db.VarChar(120)
+  headline    String   @default("") @db.VarChar(250)
+  description String   @default("") @db.Text
+  postcodes   String   @default("") @db.VarChar(120)
+  travelTime  String   @default("") @db.VarChar(160)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([region, sortOrder])
+}
